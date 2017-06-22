@@ -7,6 +7,10 @@ import path              from 'path'
 import webpack           from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 
+const __DEV__  = process.env.NODE_ENV === 'development'
+const __TEST__ = process.env.NODE_ENV === 'test'
+const __PROD__ = process.env.NODE_ENV === 'production'
+
 export default {
 
   entry: [
@@ -38,10 +42,6 @@ export default {
       {
         test: /.jsx?$/,
         use: [{ loader: 'babel-loader?compact=false' }]
-      },
-      {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader']
       }
     ]
 
@@ -56,7 +56,13 @@ export default {
     new webpack.NoEmitOnErrorsPlugin(),
     // do not emit compiled assets that include errors
 
-    new HtmlWebpackPlugin({ template: './src/index.html' })
+    new webpack.DefinePlugin({
+      __DEV__,
+      __TEST__,
+      __PROD__,
+    }),
+
+    new HtmlWebpackPlugin({ template: './src/index.html' }),
   ],
   devServer: {
     contentBase: path.join(__dirname, '/dist/'),
